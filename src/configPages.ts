@@ -16,8 +16,9 @@ export const configPages = {
     elements: {
       // Helper text
       helperText1: "<h2>Integration Connections</h2>",
-      helperText2: "Configure the connections required for this integration to work.",
-      
+      helperText2:
+        "Configure the connections required for this integration to work.",
+
       // Shopify Connection
       "Shopify Connection": connectionConfigVar({
         stableKey: "shopify-connection-41a8b723",
@@ -41,10 +42,10 @@ export const configPages = {
             type: "password",
             required: true,
             comments: "Your Shopify Admin API secret",
-          }
+          },
         },
       }),
-      
+
       // Nautical Connection
       "Nautical Connection": connectionConfigVar({
         stableKey: "nautical-connection-5fd27b9c",
@@ -68,12 +69,12 @@ export const configPages = {
             type: "string",
             required: true,
             comments: "Your Nautical Commerce tenant ID",
-          }
+          },
         },
       }),
     },
   }),
-  
+
   // General Configuration
   "General Configuration": configPage({
     tagline: "Configure general settings for the integration",
@@ -86,4 +87,4 @@ export const configPages = {
       }),
     },
   }),
-}; 
+};

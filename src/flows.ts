@@ -22,7 +22,7 @@ export const fetchItemsFlow = flow({
       // to avoid any client.ts dependency
       context.logger.info("Using placeholder API for demonstration");
       const response = await axios.get(
-        "https://my-json-server.typicode.com/prismatic-io/placeholder-data/items"
+        "https://my-json-server.typicode.com/prismatic-io/placeholder-data/items",
       );
 
       context.logger.info(`Fetched ${response.data.length} products`);

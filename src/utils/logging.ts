@@ -9,7 +9,7 @@ import type { ActionContext } from "@prismatic-io/spectral";
 export function logInfo(
   context: ActionContext,
   message: string,
-  data: Record<string, unknown> = {}
+  data: Record<string, unknown> = {},
 ): void {
   context.logger.info(message, data);
 }
@@ -23,7 +23,7 @@ export function logInfo(
 export function logError(
   context: ActionContext,
   message: string,
-  error: Error
+  error: Error,
 ): void {
   context.logger.error(message, {
     error: error.message,
@@ -41,7 +41,7 @@ export function logError(
 export function logWarning(
   context: ActionContext,
   message: string,
-  data: Record<string, unknown> = {}
+  data: Record<string, unknown> = {},
 ): void {
   context.logger.warn(message, data);
 }
@@ -55,7 +55,7 @@ export function logWarning(
 export function logDebug(
   context: ActionContext,
   message: string,
-  data: Record<string, unknown> = {}
+  data: Record<string, unknown> = {},
 ): void {
   context.logger.debug(message, data);
 }
@@ -71,7 +71,7 @@ export function logMetric(
   context: ActionContext,
   metricName: string,
   value: number,
-  tags: Record<string, unknown> = {}
+  tags: Record<string, unknown> = {},
 ): void {
   context.logger.metric(metricName, value, tags);
 }

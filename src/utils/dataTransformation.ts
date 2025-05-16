@@ -3,7 +3,7 @@
 // Transform Shopify product to Nautical Commerce format
 export function transformShopifyProductToNautical(
   shopifyProduct,
-  attributeMappings
+  attributeMappings,
 ) {
   // Extract base product data
   const baseProduct = {
@@ -26,7 +26,7 @@ export function transformShopifyProductToNautical(
     attributes: extractVariantAttributes(
       node,
       shopifyProduct.options,
-      attributeMappings
+      attributeMappings,
     ),
     externalId: node.id,
     externalSource: "shopify",
@@ -60,7 +60,7 @@ function extractVariantAttributes(variant, options, attributeMappings) {
   // Map selected options to Nautical Commerce attributes
   for (const option of variant.selectedOptions) {
     const mapping = attributeMappings.find(
-      (m) => m.shopifyAttribute === option.name
+      (m) => m.shopifyAttribute === option.name,
     );
     if (mapping) {
       attributes[mapping.nauticalAttribute] = option.value;

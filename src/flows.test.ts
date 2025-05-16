@@ -28,14 +28,14 @@ describe("Shopify to Nautical integration flows", () => {
     // Mock axios or use a mocking library like nock to intercept HTTP requests
     // For now, we'll just test the basic structure since the flow uses a public mock API
     const { result } = await invokeFlow(fetchItemsFlow, {
-      configVars: { 
+      configVars: {
         "Shopify Connection": shopifyConnection,
-        "Nautical Connection": nauticalConnection 
+        "Nautical Connection": nauticalConnection,
       },
     });
-    
+
     // Verify the result has the expected structure
     expect(result?.data).toHaveProperty("items");
     expect(result?.data).toHaveProperty("message");
   });
-}); 
+});

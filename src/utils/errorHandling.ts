@@ -13,7 +13,7 @@ export async function withRetry<T>(
   fn: () => Promise<T>,
   maxRetries = 3,
   delay = 1000,
-  context?: ActionContext
+  context?: ActionContext,
 ): Promise<T> {
   let lastError: Error | undefined;
 
@@ -31,12 +31,12 @@ export async function withRetry<T>(
         logError(
           context,
           `Attempt ${i + 1} failed. Retrying in ${retryDelay}ms`,
-          errorObject
+          errorObject,
         );
       } else {
         // Fallback to process.stdout.write
         process.stdout.write(
-          `Attempt ${i + 1} failed. Retrying in ${retryDelay}ms\n`
+          `Attempt ${i + 1} failed. Retrying in ${retryDelay}ms\n`,
         );
       }
 
@@ -59,7 +59,7 @@ export async function withRetry<T>(
 export function handleApiError(
   error: unknown,
   operation: string,
-  context?: ActionContext
+  context?: ActionContext,
 ): Error {
   // Cast the error to a specific type for better handling
   const apiError = error as {
@@ -81,26 +81,26 @@ export function handleApiError(
 
     if (status === 401 || status === 403) {
       formattedError = new Error(
-        `Authentication error: ${data?.message || "Invalid credentials"}`
+        `Authentication error: ${data?.message || "Invalid credentials"}`,
       );
     } else if (status === 429) {
       formattedError = new Error(
-        `Rate limit exceeded: ${data?.message || "Too many requests"}`
+        `Rate limit exceeded: ${data?.message || "Too many requests"}`,
       );
     } else {
       formattedError = new Error(
-        `API error (${status}): ${data?.message || apiError.message || "Unknown error"}`
+        `API error (${status}): ${data?.message || apiError.message || "Unknown error"}`,
       );
     }
   } else if (apiError.request) {
     // The request was made but no response was received
     formattedError = new Error(
-      `No response from server: ${apiError.message || "Connection failed"}`
+      `No response from server: ${apiError.message || "Connection failed"}`,
     );
   } else {
     // Something happened in setting up the request
     formattedError = new Error(
-      `Request setup error: ${apiError.message || "Unknown error"}`
+      `Request setup error: ${apiError.message || "Unknown error"}`,
     );
   }
 

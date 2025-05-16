@@ -8,9 +8,11 @@ import { createClient } from "@prismatic-io/spectral/dist/clients/http";
 
 export function createShopifyClient(shopifyConnection: Connection) {
   const { shopDomain, apiKey, apiSecret } = shopifyConnection.fields;
-  
+
   return createClient({
-    baseUrl: util.types.toString(`https://${shopDomain}.myshopify.com/admin/api/2023-04/`),
+    baseUrl: util.types.toString(
+      `https://${shopDomain}.myshopify.com/admin/api/2023-04/`,
+    ),
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
@@ -21,7 +23,7 @@ export function createShopifyClient(shopifyConnection: Connection) {
 
 export function createNauticalClient(nauticalConnection: Connection) {
   const { apiUrl, apiKey, tenantId } = nauticalConnection.fields;
-  
+
   return createClient({
     baseUrl: util.types.toString(apiUrl),
     headers: {
@@ -31,4 +33,4 @@ export function createNauticalClient(nauticalConnection: Connection) {
       "x-nautical-tenant": util.types.toString(tenantId),
     },
   });
-} 
+}
