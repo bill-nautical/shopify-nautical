@@ -1,0 +1,31 @@
+extends: prismatic/custom-component
+rules:
+  # Function naming and structure
+  function-naming:
+    severity: error
+    description: "Function names should be descriptive and follow camelCase convention"
+
+  # Logging standards
+  use-prismatic-logger:
+    severity: error
+    description: "Always use Prismatic's logger (logger.info, logger.error, etc.) instead of console.log"
+
+  # Error handling
+  proper-error-handling:
+    severity: error
+    description: "Handle errors gracefully and provide meaningful error messages"
+
+  # Configuration handling
+  config-from-inputs:
+    severity: error
+    description: "Configuration values should come from inputs, not be embedded in code"
+
+  # Async patterns
+  avoid-unnecessary-async:
+    severity: warning
+    description: "Avoid unnecessary async wrappers or IIFEs"
+
+  # Documentation
+  document-functions:
+    severity: warning
+    description: "Document functions with JSDoc comments"
