@@ -1,0 +1,110 @@
+# Shopify to Nautical Commerce Integration
+
+A Prismatic code-native integration that synchronizes products, inventory, and orders between Shopify and Nautical Commerce.
+
+## Features
+
+- **Product Import**: Import products and variants from Shopify to Nautical Commerce
+- **Attribute Mapping**: Map Shopify product options to Nautical Commerce product/variant attributes through a user-friendly UI
+- **Inventory Sync**: Keep inventory levels synchronized between platforms
+- **Order Sync**: Ensure orders are consistent across both platforms
+- **Real-time Updates**: Automatically sync changes via webhooks
+
+## Architecture Overview
+
+The integration uses Prismatic's code-native approach for maximum flexibility when implementing complex mapping logic. Key components include:
+
+- **Authentication**: OAuth 2.0 for Shopify, API key authentication for Nautical Commerce
+- **Data Transformation**: Custom mapping between platforms with user-configurable attribute mapping
+- **Error Handling**: Robust error handling with retry mechanisms
+- **Webhooks**: Real-time updates triggered by events on either platform
+- **Logging**: Comprehensive logging for troubleshooting
+
+![Architecture Overview](./assets/architecture-diagram.png)
+
+## Technology Stack
+
+- **Development Platform**: Prismatic with code-native approach
+- **Programming Language**: TypeScript
+- **APIs**:
+  - Shopify GraphQL Admin API
+  - Nautical Commerce GraphQL API
+- **Authentication**: OAuth 2.0 (Shopify) and API Key (Nautical)
+- **Deployment**: Prismatic's managed environment
+
+## Setup
+
+1. Clone this repository
+2. Install dependencies: `npm install`
+3. Build the integration: `npm run build`
+4. Deploy to Prismatic: `npm run deploy`
+
+## Configuration
+
+The integration requires connections to both Shopify and Nautical Commerce APIs:
+
+### Shopify Connection
+- Requires Shopify Admin API access with `read_products`, `write_products`, `read_inventory`, `write_inventory`, `read_orders`, and `write_orders` scopes
+- Uses GraphQL API for most operations
+
+### Nautical Commerce Connection
+- Requires API access to Nautical Commerce
+- Uses GraphQL API for operations
+
+## Flows
+
+- **Product Import Flow**: Imports products from Shopify to Nautical Commerce
+- **Product Update Webhook Flow**: Handles updates to products from Shopify
+- **Inventory Sync Flow**: Synchronizes inventory levels between platforms
+- **Order Sync Flow**: Synchronizes orders between platforms
+- **Setup Webhooks Flow**: Configures required webhooks in Shopify for real-time updates
+
+## Attribute Mapping
+
+The integration includes a UI component for mapping Shopify product options to Nautical Commerce attributes. This allows for:
+
+- Custom field mappings between platforms
+- Variant option mappings (e.g., mapping Shopify's "Color" to Nautical's "color" attribute)
+- Flexible data transformation rules
+- Saving mapping configurations for reuse
+
+## Development
+
+To extend or modify this integration:
+
+1. Make changes to the source files in the `src` directory
+2. Build the integration: `npm run build`
+3. Test locally
+4. Deploy to Prismatic: `npm run deploy`
+
+## Project Structure
+
+```
+shopify-nautical-integration/
+├── assets/                  # Images and static assets
+├── src/                     # Source code
+│   ├── components/          # UI components
+│   │   └── MappingUI.tsx    # Attribute mapping UI component
+│   ├── connections/         # API connection definitions
+│   │   ├── nautical.ts      # Nautical Commerce connection
+│   │   └── shopify.ts       # Shopify connection
+│   ├── flows/               # Integration flows
+│   │   ├── productImport.ts # Product import flow
+│   │   ├── inventorySync.ts # Inventory sync flow
+│   │   ├── orderSync.ts     # Order sync flow
+│   │   └── setupWebhooks.ts # Webhooks setup flow
+│   ├── utils/               # Utility functions
+│   │   ├── dataTransformation.ts  # Data transformation helpers
+│   │   ├── errorHandling.ts       # Error handling utilities
+│   │   └── logging.ts             # Logging utilities
+│   ├── config.ts            # Configuration page definitions
+│   ├── componentRegistry.ts # Register custom components
+│   └── index.ts             # Integration entry point
+├── package.json             # Node.js dependencies
+├── tsconfig.json            # TypeScript configuration
+└── README.md                # Documentation
+```
+
+## License
+
+MIT 
