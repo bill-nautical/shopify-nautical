@@ -8,12 +8,15 @@ export const shopifyConnection = connection({
     authorizeUrl: "https://{{#domain}}.myshopify.com/admin/oauth/authorize/",
     tokenUrl: "https://{{#domain}}.myshopify.com/admin/oauth/access_token",
     scopes: [
-      "read_products", "write_products",
-      "read_inventory", "write_inventory",
-      "read_orders", "write_orders"
+      "read_products",
+      "write_products",
+      "read_inventory",
+      "write_inventory",
+      "read_orders",
+      "write_orders",
     ],
     // Additional OAuth configuration
-  }
+  },
 });
 
 export const nauticalConnection = connection({
@@ -23,7 +26,8 @@ export const nauticalConnection = connection({
       label: "API URL",
       type: "string",
       required: true,
-      comments: "The Nautical Commerce API endpoint (e.g., https://api-{your_domain}.com/graphql/)",
+      comments:
+        "The Nautical Commerce API endpoint (e.g., https://api-{your_domain}.com/graphql/)",
     },
     apiKey: {
       label: "API Key",
@@ -31,5 +35,5 @@ export const nauticalConnection = connection({
       required: true,
       comments: "Nautical Commerce API Key",
     },
-  }
+  },
 });
