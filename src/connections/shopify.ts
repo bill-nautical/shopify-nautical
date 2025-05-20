@@ -1,50 +1,22 @@
-import { oauth2Connection } from "@prismatic-io/spectral";
+import { connection } from "@prismatic-io/spectral";
 
-export const shopifyConnection = oauth2Connection({
+export const shopifyConnection = connection({
   key: "shopify",
   label: "Shopify",
-  comments: "Connection to Shopify Admin API",
+  comments: "Connection to Shopify store",
   inputs: {
-    subdomain: {
+    shopDomain: {
       label: "Shop Domain",
       type: "string",
       required: true,
-      placeholder: "my-store",
-      comments: "The Shopify store subdomain, without '.myshopify.com'",
+      comments: "Your Shopify store domain (e.g., your-store.myshopify.com)",
     },
-    clientId: {
-      label: "Client ID",
+    apiKey: {
+      label: "API Key",
       type: "string",
       required: true,
-      comments: "Your Shopify app's client ID",
-    },
-    clientSecret: {
-      label: "Client Secret",
-      type: "string",
-      required: true,
-      comments: "Your Shopify app's client secret",
-    },
-  },
-  authorizationUrl:
-    "https://{{ subdomain }}.myshopify.com/admin/oauth/authorize",
-  accessTokenUrl:
-    "https://{{ subdomain }}.myshopify.com/admin/oauth/access_token",
-  tokenUrl: "https://{{ subdomain }}.myshopify.com/admin/oauth/access_token",
-  scopes: [
-    "read_products",
-    "write_products",
-    "read_orders",
-    "write_orders",
-    "read_inventory",
-    "write_inventory",
-  ],
-  tokenParams: {
-    includeCredentials: true,
-  },
-  requestParams: {
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
+      comments: "Your Shopify Admin API access token",
+      sensitive: true,
     },
   },
 });

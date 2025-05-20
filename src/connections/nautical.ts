@@ -3,28 +3,25 @@ import { connection } from "@prismatic-io/spectral";
 export const nauticalConnection = connection({
   key: "nautical",
   label: "Nautical Commerce",
-  comments: "Connection to Nautical Commerce API",
+  comments: "Connection to Nautical Commerce",
   inputs: {
     apiUrl: {
       label: "API URL",
       type: "string",
       required: true,
-      placeholder: "https://api-{your_domain}.com/graphql/",
-      comments: "The Nautical Commerce GraphQL API endpoint",
+      comments: "Your Nautical Commerce API endpoint",
     },
     apiKey: {
       label: "API Key",
-      type: "password",
+      type: "string",
       required: true,
-      placeholder: "your-api-key",
-      comments: "The Nautical Commerce API key",
+      comments: "Your Nautical Commerce API key",
     },
     tenantId: {
       label: "Tenant ID",
       type: "string",
       required: true,
-      placeholder: "7bec1fcd",
-      comments: "The Nautical Commerce tenant ID for multi-tenant environments",
+      comments: "Your Nautical Commerce tenant ID",
     },
   },
   oauth2Config: undefined,
