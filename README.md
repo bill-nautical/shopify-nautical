@@ -1,73 +1,116 @@
-# Shopify Nautical Integration
+# Shopify to Nautical Commerce Integration
 
-This is a Prismatic integration between Shopify and Nautical Commerce.
+This integration connects Shopify and Nautical Commerce, enabling seamless product synchronization between the two platforms.
 
-## Development
+## Features
 
-To develop this integration:
+- Product Import: Import products from Shopify to Nautical Commerce
+- Inventory Sync: Keep inventory levels synchronized between platforms
+- Order Sync: Synchronize orders between platforms
+- Webhook Support: Real-time updates via webhooks
+
+## Prerequisites
+
+- Shopify store with API access
+- Nautical Commerce account with API credentials
+- Prismatic account
+
+## Setup
 
 1. Install dependencies:
 
-   ```
+   ```bash
    npm install
    ```
 
 2. Build the integration:
 
-   ```
+   ```bash
    npm run build
    ```
 
-3. Test the integration:
-   ```
-   npm test
-   ```
-
-## Deployment
-
-This integration can be deployed to Prismatic using the built-in deployment script.
-
-### Prerequisites
-
-1. Create a `.env` file in the root directory with your Prismatic credentials:
-
-   ```
-   PRISMATIC_CLIENT_ID=your_client_id_here
-   PRISMATIC_CLIENT_SECRET=your_client_secret_here
+3. Import into Prismatic:
+   ```bash
+   npm run import
    ```
 
-2. Install dependencies:
-   ```
-   npm install
-   ```
+## Configuration
 
-### Deploy
+### Shopify Connection
 
-To deploy the integration:
+- Shop Domain: Your Shopify store domain (e.g., `your-store.myshopify.com`)
+- API Key: Your Shopify Admin API access token
 
-1. Build the integration:
+### Nautical Commerce Connection
 
-   ```
-   npm run build
-   ```
+- API URL: Your Nautical Commerce API endpoint
+- API Key: Your Nautical Commerce API key
+- Tenant ID: Your Nautical Commerce tenant ID
 
-2. Deploy to Prismatic:
-   ```
-   npm run deploy
-   ```
+### Webhook Setup
 
-The deployment script will:
+1. In your Shopify admin, go to Settings > Notifications > Webhooks
+2. Add a new webhook:
+   - Event: Product updates
+   - Format: JSON
+   - URL: Your Prismatic webhook URL
+   - Version: 2023-04
 
-1. Build the integration from the source code
-2. Publish the integration to your Prismatic account
-3. Output the published version number
+## Usage
 
-## CI/CD Integration
+### Product Import
 
-For CI/CD pipelines, set the environment variables `PRISMATIC_CLIENT_ID` and `PRISMATIC_CLIENT_SECRET` in your CI/CD platform's secrets management system, then run:
+1. Navigate to the "Product Import" flow in Prismatic
+2. Configure attribute mappings if needed
+3. Run the flow to import products
+
+### Inventory Sync
+
+1. Navigate to the "Inventory Sync" flow
+2. Configure sync settings
+3. Enable the flow for automatic synchronization
+
+### Order Sync
+
+1. Navigate to the "Order Sync" flow
+2. Configure order mapping settings
+3. Enable the flow for automatic synchronization
+
+## Development
+
+### Project Structure
 
 ```
-npm install
+src/
+  ├── components/     # Prismatic components
+  ├── connections/    # Connection definitions
+  ├── flows/         # Integration flows
+  ├── utils/         # Utility functions
+  └── index.ts       # Main integration file
+```
+
+### Building
+
+```bash
 npm run build
-npm run deploy
 ```
+
+### Testing
+
+```bash
+npm test
+```
+
+### Linting
+
+```bash
+npm run lint
+```
+
+## Support
+
+For support, please contact your Prismatic administrator or open an issue in this repository.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

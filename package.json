@@ -18,13 +18,10 @@
     ]
   },
   "dependencies": {
-    "@prismatic-io/client": "^5.0.0",
     "@prismatic-io/spectral": "10.5.8",
-    "@types/react": "^19.1.4",
     "axios": "^0.27.2",
     "dotenv": "^16.3.1",
-    "lodash": "^4.17.21",
-    "react": "^19.1.0"
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@prismatic-io/eslint-config-spectral": "2.1.0",
