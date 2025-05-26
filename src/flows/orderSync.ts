@@ -1,41 +1,122 @@
-import { flow } from "@prismatic-io/spectral";
+import {
+  flow,
+  type ActionContext,
+  type ConfigVarResultCollection,
+  type TriggerPayload,
+} from "@prismatic-io/spectral";
 import axios from "axios";
 import { withRetry, handleApiError } from "../utils/errorHandling";
 import { logInfo, logError } from "../utils/logging";
+
+interface ConfigVars {
+  shopify: {
+    apiUrl: string;
+    accessToken: string;
+  };
+  nautical: {
+    apiUrl: string;
+    apiKey: string;
+    tenantId: string;
+  };
+}
+
+interface ShopifyOrder {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  totalPrice: string;
+  displayFinancialStatus: string;
+  lineItems: {
+    edges: Array<{
+      node: {
+        id: string;
+        name: string;
+        quantity: number;
+        originalTotalPrice: string;
+        variant?: {
+          id: string;
+          sku: string;
+          product: {
+            id: string;
+          };
+        };
+      };
+    }>;
+  };
+  shippingAddress?: {
+    firstName: string;
+    lastName: string;
+    address1: string;
+    address2?: string;
+    city: string;
+    province: string;
+    zip: string;
+    country: string;
+    phone: string;
+  };
+  billingAddress?: {
+    firstName: string;
+    lastName: string;
+    address1: string;
+    address2?: string;
+    city: string;
+    province: string;
+    zip: string;
+    country: string;
+    phone: string;
+  };
+}
+
+interface ShopifyConnection {
+  apiUrl: string;
+  accessToken: string;
+}
+
+interface NauticalConnection {
+  apiUrl: string;
+  apiKey: string;
+  tenantId: string;
+}
+
+interface OrderTriggerPayload extends TriggerPayload {
+  results?: {
+    body?: {
+      data?: ShopifyOrder;
+    };
+  };
+}
 
 export const orderSyncFlow = flow({
   name: "Order Sync",
   stableKey: "order-sync",
   description: "Synchronize orders between Shopify and Nautical Commerce",
 
-  // Triggered by webhook or schedule
-  onExecution: async (context, params) => {
-    const shopifyConnection = params.connections.shopify;
-    const nauticalConnection = params.connections.nautical;
-    const orderData = params.onTrigger?.results?.body?.data;
-
+  onExecution: async (context: ActionContext, payload: OrderTriggerPayload) => {
     try {
+      const orderData = payload.results?.body?.data;
+      const shopifyConfig = context.configVars[
+        "Shopify Connection"
+      ] as unknown as ShopifyConnection;
+      const nauticalConfig = context.configVars[
+        "Nautical Connection"
+      ] as unknown as NauticalConnection;
+
       if (orderData) {
         // Handle webhook event for specific order
-        await processOrderWebhook(
-          shopifyConnection,
-          nauticalConnection,
-          orderData,
-        );
+        await processOrderWebhook(shopifyConfig, nauticalConfig, orderData);
 
         logInfo(
           context,
           `Successfully processed order webhook: ${orderData.id}`,
           {
             orderId: orderData.id,
-          },
+            orderNumber: orderData.name,
+          }
         );
       } else {
         // Schedule-based sync for all orders in a time period
-        const syncResult = await syncAllOrders(
-          shopifyConnection,
-          nauticalConnection,
-        );
+        const syncResult = await syncAllOrders(shopifyConfig, nauticalConfig);
 
         logInfo(context, `Synchronized ${syncResult.total} orders`, {
           created: syncResult.created,
@@ -51,35 +132,33 @@ export const orderSyncFlow = flow({
         },
       };
     } catch (error) {
-      logError(context, "Order sync failed", error as Error);
-      throw error;
+      const formattedError =
+        error instanceof Error ? error : new Error(String(error));
+      logError(context, "Order sync failed", formattedError);
+      throw formattedError;
     }
   },
 });
 
-// Helper functions for order sync
 async function processOrderWebhook(
-  shopifyConn: any,
-  nauticalConn: any,
-  orderData: any,
+  shopifyConn: ShopifyConnection,
+  nauticalConn: NauticalConnection,
+  orderData: ShopifyOrder
 ) {
-  // Check if the order exists in Nautical Commerce
   const existingOrder = await findOrderByExternalId(nauticalConn, orderData.id);
 
   if (existingOrder) {
-    // Update existing order
     return await updateOrder(nauticalConn, existingOrder.id, orderData);
-  } else {
-    // Create new order
-    return await createOrder(nauticalConn, orderData);
   }
+
+  return await createOrder(nauticalConn, orderData);
 }
 
-async function syncAllOrders(shopifyConn: any, nauticalConn: any) {
-  // Get recent orders from Shopify
+async function syncAllOrders(
+  shopifyConn: ShopifyConnection,
+  nauticalConn: NauticalConnection
+) {
   const recentOrders = await getRecentShopifyOrders(shopifyConn);
-
-  // Process each order
   const results = {
     total: recentOrders.length,
     created: 0,
@@ -92,7 +171,6 @@ async function syncAllOrders(shopifyConn: any, nauticalConn: any) {
       const existingOrder = await findOrderByExternalId(nauticalConn, order.id);
 
       if (existingOrder) {
-        // Check if the order needs to be updated (e.g., status changed)
         if (
           existingOrder.status !==
           mapShopifyStatusToNautical(order.displayFinancialStatus)
@@ -108,15 +186,13 @@ async function syncAllOrders(shopifyConn: any, nauticalConn: any) {
       }
     } catch (error) {
       console.error(`Failed to process order ${order.id}:`, error);
-      // Continue with next order even if this one fails
     }
   }
 
   return results;
 }
 
-async function getRecentShopifyOrders(connection: any) {
-  // Get orders from the last 24 hours
+async function getRecentShopifyOrders(connection: ShopifyConnection) {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
   const createdAtMin = yesterday.toISOString();
@@ -195,16 +271,21 @@ async function getRecentShopifyOrders(connection: any) {
           query,
           variables: { createdAtMin },
         },
-      }),
+      })
     );
 
-    return response.data.data.orders.edges.map((edge: any) => edge.node);
+    return response.data.data.orders.edges.map(
+      (edge: { node: ShopifyOrder }) => edge.node
+    );
   } catch (error) {
     throw handleApiError(error, "Get Recent Shopify Orders");
   }
 }
 
-async function findOrderByExternalId(connection: any, externalId: string) {
+async function findOrderByExternalId(
+  connection: NauticalConnection,
+  externalId: string
+) {
   const query = `
     query FindOrderByExternalId($externalId: String!) {
       orders(filter: { externalId: { eq: $externalId } }, first: 1) {
@@ -244,7 +325,6 @@ async function findOrderByExternalId(connection: any, externalId: string) {
 }
 
 function mapShopifyStatusToNautical(shopifyStatus: string) {
-  // Map Shopify order status to Nautical Commerce status
   const statusMap: Record<string, string> = {
     PAID: "PAID",
     PARTIALLY_PAID: "PARTIALLY_PAID",
@@ -258,8 +338,10 @@ function mapShopifyStatusToNautical(shopifyStatus: string) {
   return statusMap[shopifyStatus] || "PENDING";
 }
 
-async function createOrder(connection: any, orderData: any) {
-  // Transform order data to Nautical Commerce format
+async function createOrder(
+  connection: NauticalConnection,
+  orderData: ShopifyOrder
+) {
   const nauticalOrder = transformShopifyOrderToNautical(orderData);
 
   const mutation = `
@@ -308,8 +390,11 @@ async function createOrder(connection: any, orderData: any) {
   }
 }
 
-async function updateOrder(connection: any, id: string, orderData: any) {
-  // Transform order data to Nautical Commerce format
+async function updateOrder(
+  connection: NauticalConnection,
+  id: string,
+  orderData: ShopifyOrder
+) {
   const nauticalOrder = transformShopifyOrderToNautical(orderData);
 
   const mutation = `
@@ -359,21 +444,17 @@ async function updateOrder(connection: any, id: string, orderData: any) {
   }
 }
 
-// Transform Shopify order to Nautical Commerce format
-function transformShopifyOrderToNautical(shopifyOrder: any) {
-  // Extract line items
-  const lineItems =
-    shopifyOrder.lineItems?.edges?.map((edge: any) => {
-      const node = edge.node;
-      return {
-        productVariantId: node.variant?.id,
-        quantity: node.quantity,
-        price: parseFloat(node.originalTotalPrice) / node.quantity,
-        sku: node.variant?.sku,
-      };
-    }) || [];
+function transformShopifyOrderToNautical(shopifyOrder: ShopifyOrder) {
+  const lineItems = shopifyOrder.lineItems.edges.map((edge) => {
+    const node = edge.node;
+    return {
+      productVariantId: node.variant?.id,
+      quantity: node.quantity,
+      price: Number.parseFloat(node.originalTotalPrice) / node.quantity,
+      sku: node.variant?.sku,
+    };
+  });
 
-  // Extract shipping address
   const shippingAddress = shopifyOrder.shippingAddress
     ? {
         firstName: shopifyOrder.shippingAddress.firstName,
@@ -388,7 +469,6 @@ function transformShopifyOrderToNautical(shopifyOrder: any) {
       }
     : null;
 
-  // Extract billing address
   const billingAddress = shopifyOrder.billingAddress
     ? {
         firstName: shopifyOrder.billingAddress.firstName,
@@ -409,7 +489,7 @@ function transformShopifyOrderToNautical(shopifyOrder: any) {
     customerEmail: shopifyOrder.email,
     customerPhone: shopifyOrder.phone,
     status: mapShopifyStatusToNautical(shopifyOrder.displayFinancialStatus),
-    totalPrice: parseFloat(shopifyOrder.totalPrice),
+    totalPrice: Number.parseFloat(shopifyOrder.totalPrice),
     lineItems,
     shippingAddress,
     billingAddress,

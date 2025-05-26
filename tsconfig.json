@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "lib": ["esnext", "dom"],
-    "strict": false,
-    "noImplicitAny": false,
+    "target": "es2018",
+    "module": "commonjs",
+    "lib": ["es2018", "esnext.asynciterable"],
+    "declaration": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "jsx": "react",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["src", ".spectral/*"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

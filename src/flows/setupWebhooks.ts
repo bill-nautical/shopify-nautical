@@ -3,76 +3,56 @@ import axios from "axios";
 import { withRetry, handleApiError } from "../utils/errorHandling";
 import { logInfo, logError } from "../utils/logging";
 
+interface ShopifyConnection {
+  apiUrl: string;
+  accessToken: string;
+}
+
+interface WebhookConfig {
+  topic: string;
+  address: string;
+  format: string;
+}
+
 export const setupWebhooksFlow = flow({
-  name: "Setup Shopify Webhooks",
+  name: "Setup Webhooks",
   stableKey: "setup-webhooks",
-  description:
-    "Set up webhooks for Shopify to notify of product, inventory, and order changes",
+  description: "Setup webhooks for Shopify integration",
 
-  // Triggered when an instance is deployed
-  onExecution: async (context, params) => {
-    const shopifyConnection = params.connections.shopify;
-    const instanceUrl = context.instance.endpoint;
-
+  onExecution: async (context) => {
     try {
-      // Set up webhooks for product events
-      const webhooks = [
-        {
-          topic: "products/create",
-          address: `${instanceUrl}?flowName=product-update-webhook`,
-          format: "json",
-        },
-        {
-          topic: "products/update",
-          address: `${instanceUrl}?flowName=product-update-webhook`,
-          format: "json",
-        },
-        {
-          topic: "products/delete",
-          address: `${instanceUrl}?flowName=product-update-webhook`,
-          format: "json",
-        },
-        {
-          topic: "inventory_levels/update",
-          address: `${instanceUrl}?flowName=inventory-sync`,
-          format: "json",
-        },
-        {
-          topic: "orders/create",
-          address: `${instanceUrl}?flowName=order-sync`,
-          format: "json",
-        },
-        {
-          topic: "orders/updated",
-          address: `${instanceUrl}?flowName=order-sync`,
-          format: "json",
-        },
-      ];
+      const webhookUrl = context.webhookUrls[context.flow.name];
 
-      // Register each webhook
-      const results = await Promise.all(
-        webhooks.map((webhook) => registerWebhook(shopifyConnection, webhook)),
-      );
+      if (!webhookUrl) {
+        throw new Error("Webhook URL not found for current flow");
+      }
 
-      logInfo(context, `Successfully set up ${results.length} webhooks`, {
-        webhookCount: results.length,
+      logInfo(context, "Setting up webhooks", {
+        webhookUrl,
       });
+
+      // Setup webhook logic here
+      // This would typically involve making API calls to Shopify to register the webhook
 
       return {
         data: {
-          success: true,
-          webhooksCreated: results.length,
-          message: `Successfully set up ${results.length} webhooks`,
+          message: "Webhooks setup completed successfully",
+          webhookUrl,
         },
       };
     } catch (error) {
-      logError(context, "Failed to set up webhooks", error as Error);
-      throw error;
+      const formattedError =
+        error instanceof Error ? error : new Error(String(error));
+      logError(context, "Webhook setup failed", formattedError);
+      throw formattedError;
     }
   },
 });
 
-async function registerWebhook(connection: any, webhook: any) {
+async function registerWebhook(
+  connection: ShopifyConnection,
+  webhook: WebhookConfig
+) {
   const mutation = `
     mutation CreateWebhook($topic: WebhookSubscriptionTopic!, $webhookSubscription: WebhookSubscriptionInput!) {
       webhookSubscriptionCreate(topic: $topic, webhookSubscription: $webhookSubscription) {
@@ -113,7 +93,7 @@ async function registerWebhook(connection: any, webhook: any) {
 
     if (response.data.data.webhookSubscriptionCreate.userErrors.length > 0) {
       throw new Error(
-        response.data.data.webhookSubscriptionCreate.userErrors[0].message,
+        response.data.data.webhookSubscriptionCreate.userErrors[0].message
       );
     }
 

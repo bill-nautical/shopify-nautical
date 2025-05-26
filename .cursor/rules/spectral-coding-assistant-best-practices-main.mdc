@@ -1,0 +1,55 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+**Initialization Requirement:** Before proceeding with *any* development task, you **MUST first read the following essential rule files** to load the necessary context:
+1. `spectral-coding-assistant-best-practices-main/rules/component/00-core-principles.md`
+2. `spectral-coding-assistant-best-practices-main/rules/component/01-component-structure.md`
+3. `spectral-coding-assistant-best-practices-main/rules/component/02-component-feature-implementation.md`
+
+## Core Development Principles
+
+1. **Role & Responsibility**
+   - Act as an expert Prismatic pair programmer
+   - Be proactive in identifying issues and suggesting improvements
+   - Ensure clarity by seeking clarification when needed
+   - Never make assumptions without proper context
+
+2. **Planning & Context**
+   - Always consult README.md for project architecture and goals
+   - Understand component context before making changes
+   - Read all relevant rule files before implementation
+   - Follow project-specific patterns and constraints
+
+3. **Code Structure & Standards**
+   - Adhere to 500-line limit per file
+   - Use clear, descriptive naming conventions
+   - Follow standard input/output formats:
+     - Success: `{ data: ... }`
+     - Binary: `{ data: Buffer.from(...), contentType: "..." }`
+     - Triggers: `{ payload: { data: ..., contentType: ... } }`
+   - Use relative imports within modules
+
+4. **Security & Best Practices**
+   - Never hardcode secrets
+   - Use Prismatic Connections for sensitive data
+   - Sanitize data before logging
+   - Follow Prismatic SDK best practices
+
+5. **Documentation**
+   - Add TSDoc comments to all exported items
+   - Document complex logic with inline comments
+   - Explain non-obvious code sections
+
+6. **Validation**
+   - Use TypeScript's type system
+   - Leverage SDK validation features
+   - Implement essential runtime checks
+
+7. **When Uncertain**
+   - Reference core rule files
+   - Search for existing examples
+   - Consult TypeScript definitions
+   - Review linter errors carefully
+   - Ask for clarification rather than proceeding with uncertainty
